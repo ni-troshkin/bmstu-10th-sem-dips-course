@@ -1,0 +1,153 @@
+version: "3"
+services:
+  postgres:
+    image: library/postgres:13
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+
+  rating_db:
+    image: nitroshkin/db-rating:${APP_VERSION}
+    container_name: rating_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${RATING_PG_PASSWORD}
+      POSTGRES_USER: dev
+      POSTGRES_DB: ratingservice
+      PGDATA: /home/data
+      POSTGRES_INITDB_ARGS: "-A md5"
+    expose:
+      - 5432
+    ports:
+      - "54321:5432"
+    volumes:
+      - db-data:/data/lib/postgresql/data
+
+  rating_server:
+    image: nitroshkin/service-rating:${APP_VERSION}
+    container_name: rating
+    expose:
+     - 8050
+    ports:
+      - "8050:8050"
+    depends_on:
+      - rating_db
+      - kafka
+    restart: unless-stopped
+
+  library_db:
+    image: nitroshkin/db-library:${APP_VERSION}
+    container_name: library_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${LIBRARY_PG_PASSWORD}
+      POSTGRES_USER: dev
+      POSTGRES_DB: libraryservice
+      PGDATA: /home/data
+      POSTGRES_INITDB_ARGS: "-A md5"
+    expose:
+      - 5433
+    ports:
+      - "54322:5432"
+    volumes:
+      - db-data:/data/lib/postgresql/data
+
+  library_server:
+    image: nitroshkin/service-library:${APP_VERSION}
+    container_name: library
+    expose:
+     - 8060
+    ports:
+      - "8060:8060"
+    depends_on:
+      - library_db
+      - kafka
+    restart: unless-stopped
+
+  reservation_db:
+    image: nitroshkin/db-reservations:${APP_VERSION}
+    container_name: reservation_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${RESERVATIONS_PG_PASSWORD}
+      POSTGRES_USER: dev
+      POSTGRES_DB: reservationservice
+      PGDATA: /home/data
+      POSTGRES_INITDB_ARGS: "-A md5"
+    expose:
+      - 5434
+    ports:
+      - "54323:5432"
+    volumes:
+      - db-data:/data/lib/postgresql/data
+
+  reservation_server:
+    image: nitroshkin/service-reservations:${APP_VERSION}
+    container_name: reservations
+    expose:
+     - 8070
+    ports:
+      - "8070:8070"
+    depends_on:
+      - reservation_db
+    restart: unless-stopped
+
+  gateway_server:
+    image: nitroshkin/service-gateway:${APP_VERSION}
+    container_name: gateway
+    expose:
+     - 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - reservation_server
+      - library_server
+      - rating_server
+      - kafka
+    restart: unless-stopped
+    
+  zookeeper:
+    image: zookeeper:3.7.0
+    container_name: zookeeper
+    restart: "no"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: obsidiandynamics/kafka
+    container_name: kafka
+    restart: "no"
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: DOCKER_INTERNAL://:9092,DOCKER_EXTERNAL://:29092
+      KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka:9092,DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    depends_on:
+      - "kafka"
+
+volumes:
+  db-data:
