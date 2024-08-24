@@ -44,8 +44,10 @@ public class LibraryService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    public ResponseEntity<ArrayList<LibraryResponse>> getLibrariesByCity(String city) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    public ResponseEntity<ArrayList<LibraryResponse>> getLibrariesByCity(String city, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<ArrayList<LibraryResponse>> libs = null;
         try {
             libs = libraryCircuitBreaker.run(
@@ -64,8 +66,10 @@ public class LibraryService {
         return libs;
     }
 
-    public ResponseEntity<ArrayList<LibraryBookResponse>> getBooksByLibrary(UUID libraryUid, boolean showAll) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    public ResponseEntity<ArrayList<LibraryBookResponse>> getBooksByLibrary(UUID libraryUid, boolean showAll, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<ArrayList<LibraryBookResponse>> books = null;
         try {
             books = bookCircuitBreaker.run(

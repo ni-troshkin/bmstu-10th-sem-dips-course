@@ -1,0 +1,38 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: nitroshkin/db-stats:${APP_VERSION}
+    container_name: stats_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${STATS_PG_PASSWORD}
+      POSTGRES_USER: dev
+      POSTGRES_DB: statsservice
+      PGDATA: /home/data
+      POSTGRES_INITDB_ARGS: "-A md5"
+    expose:
+      - 5432
+    ports:
+      - "54325:5432"
+    volumes:
+      - pg_data_volume:/data/lib/postgresql/data
+
+  server:
+    image: nitroshkin/service-stats:${APP_VERSION}
+    container_name: stats
+    expose:
+     - 8040
+    ports:
+      - "8040:8040"
+    depends_on:
+      - db
+    restart: unless-stopped
+   
+volumes:
+  pg_data_volume:
+
+
+

@@ -2,6 +2,7 @@ package com.gatewayservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gatewayservice.dto.*;
+import com.gatewayservice.jwt.JwtAuthentication;
 import com.gatewayservice.producer.LibraryProducer;
 import com.gatewayservice.producer.RatingProducer;
 import org.apache.catalina.User;
@@ -13,6 +14,7 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -98,8 +100,10 @@ public class ReservationService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    private BookInfo getBookInfo(UUID bookUid) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private BookInfo getBookInfo(UUID bookUid, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<BookInfo> book = null;
 
         try {
@@ -119,8 +123,10 @@ public class ReservationService {
         return book.getBody();
     }
 
-    private LibraryResponse getLibraryInfo(UUID libraryUid) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private LibraryResponse getLibraryInfo(UUID libraryUid, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<LibraryResponse> lib = null;
 
         try {
@@ -140,8 +146,10 @@ public class ReservationService {
         return lib.getBody();
     }
 
-    private ReservationResponse getReservationInfo(UUID reservationUid) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private ReservationResponse getReservationInfo(UUID reservationUid, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<ReservationResponse> res = null;
 
         try {
@@ -161,8 +169,10 @@ public class ReservationService {
         return res.getBody();
     }
 
-    private ResponseEntity<LibraryBookResponse> getLibraryBookInfo(UUID libraryUid, UUID bookUid) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private ResponseEntity<LibraryBookResponse> getLibraryBookInfo(UUID libraryUid, UUID bookUid, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<LibraryBookResponse> book = null;
 
         try {
@@ -183,10 +193,9 @@ public class ReservationService {
         return book;
     }
 
-    private ResponseEntity<Integer> countRented(String username) {
+    private ResponseEntity<Integer> countRented(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
-
+        headers.setBearerAuth(token);
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<Integer> rented = null;
         try {
@@ -206,9 +215,9 @@ public class ReservationService {
         return rented;
     }
 
-    private ResponseEntity<UserRatingResponse> getRating(String username) {
+    private ResponseEntity<UserRatingResponse> getRating(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
+        headers.setBearerAuth(token);
 
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<UserRatingResponse> rating = null;
@@ -229,9 +238,9 @@ public class ReservationService {
         return rating;
     }
 
-    private ResponseEntity<String> updateRating(String username, int delta) {
+    private ResponseEntity<String> updateRating(String token, int delta) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
+        headers.setBearerAuth(token);
 
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<String> response = null;
@@ -251,9 +260,9 @@ public class ReservationService {
         return response;
     }
 
-    private ResponseEntity<ReservationResponse> createReservation(String username, TakeBookRequest req) {
+    private ResponseEntity<ReservationResponse> createReservation(String token, TakeBookRequest req) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
+        headers.setBearerAuth(token);
 
         HttpEntity<TakeBookRequest> entity = new HttpEntity<>(req, headers);
         ResponseEntity<ReservationResponse> reservation = null;
@@ -271,8 +280,10 @@ public class ReservationService {
         return reservation;
     }
 
-    private ResponseEntity<String> closeReservation(UUID reservationUid, boolean isExpired) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private ResponseEntity<String> closeReservation(UUID reservationUid, boolean isExpired, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<String> response = null;
 
         try {
@@ -290,8 +301,10 @@ public class ReservationService {
         return response;
     }
 
-    private ResponseEntity<String> updAvailable(TakeBookRequest req, boolean isRented) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private ResponseEntity<String> updAvailable(TakeBookRequest req, boolean isRented, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<String> response = null;
 
         try {
@@ -310,27 +323,27 @@ public class ReservationService {
 
         return response;
     }
+//
+//    private void addUser(String token) {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setBearerAuth(token);
+//
+//        HttpEntity<String> entity = new HttpEntity<>("body", headers);
+//        try {
+//            restTemplate.exchange(
+//                    ratingServerUrl + "/api/v1/rating",
+//                    HttpMethod.POST,
+//                    entity,
+//                    void.class
+//            );
+//        } catch (HttpClientErrorException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    private void addUser(String username) {
+    public ResponseEntity<ArrayList<BookReservationResponse>> getAllReservations(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
-
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
-        try {
-            restTemplate.exchange(
-                    ratingServerUrl + "/api/v1/rating",
-                    HttpMethod.POST,
-                    entity,
-                    void.class
-            );
-        } catch (HttpClientErrorException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ResponseEntity<ArrayList<BookReservationResponse>> getAllReservations(String username) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
+        headers.setBearerAuth(token);
 
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<ArrayList<ReservationResponse>> reservations = null;
@@ -350,8 +363,8 @@ public class ReservationService {
 
         ArrayList<BookReservationResponse> allRes = new ArrayList<>();
         for (ReservationResponse res : reservations.getBody()) {
-            BookInfo book = getBookInfo(res.getBookUid());
-            LibraryResponse lib = getLibraryInfo(res.getLibraryUid());
+            BookInfo book = getBookInfo(res.getBookUid(), token);
+            LibraryResponse lib = getLibraryInfo(res.getLibraryUid(), token);
 
             allRes.add(new BookReservationResponse(res.getReservationUid(),
                     res.getStatus(), res.getStartDate(), res.getTillDate(), book, lib));
@@ -360,8 +373,10 @@ public class ReservationService {
         return ResponseEntity.status(reservations.getStatusCode()).body(allRes);
     }
 
-    private void cancelReservation(UUID reservationUid) {
-        HttpEntity<String> entity = new HttpEntity<>("body");
+    private void cancelReservation(UUID reservationUid, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
         try {
             restTemplate.exchange(
                     reservServerUrl + "/api/v1/reservations/" + reservationUid.toString(),
@@ -374,14 +389,14 @@ public class ReservationService {
         }
     }
 
-    public TakeBookResponse takeBook(String username, TakeBookRequest req) {
-        ResponseEntity<Integer> rentedResponse = countRented(username);
+    public TakeBookResponse takeBook(String token, TakeBookRequest req) {
+        ResponseEntity<Integer> rentedResponse = countRented(token);
         if (rentedResponse.getStatusCode() != HttpStatus.OK)
             return null;
 
         int rented = rentedResponse.getBody();
 
-        ResponseEntity<UserRatingResponse> ratingResponse = getRating(username);
+        ResponseEntity<UserRatingResponse> ratingResponse = getRating(token);
         if (ratingResponse.getStatusCode() != HttpStatus.OK)
             return null;
 
@@ -393,38 +408,38 @@ public class ReservationService {
         if (rented >= rating.getStars())
             System.out.println("Много");
 
-        ResponseEntity<ReservationResponse> reservationResponse = createReservation(username, req);
+        ResponseEntity<ReservationResponse> reservationResponse = createReservation(token, req);
 
         if (reservationResponse.getStatusCode() != HttpStatus.OK)
             return null;
 
         ReservationResponse reservation = reservationResponse.getBody();
         // saga pattern
-        ResponseEntity<String> libResponse = updAvailable(req, true);
+        ResponseEntity<String> libResponse = updAvailable(req, true, token);
 
         if (libResponse == null || libResponse.getStatusCode() != HttpStatus.OK) {
-            cancelReservation(reservation.getReservationUid());
+            cancelReservation(reservation.getReservationUid(), token);
             return null;
         }
 
         return new TakeBookResponse(reservation.getReservationUid(), reservation.getStatus(),
-                reservation.getStartDate(), reservation.getTillDate(), getBookInfo(reservation.getBookUid()),
-                getLibraryInfo(reservation.getLibraryUid()), rating);
+                reservation.getStartDate(), reservation.getTillDate(), getBookInfo(reservation.getBookUid(), token),
+                getLibraryInfo(reservation.getLibraryUid(), token), rating);
     }
 
-    public HttpStatus returnBook(UUID reservationUid, String username,
+    public HttpStatus returnBook(UUID reservationUid, String token,
                                  ReturnBookRequest req) throws JsonProcessingException {
-        ReservationResponse reservation = getReservationInfo(reservationUid);
+        ReservationResponse reservation = getReservationInfo(reservationUid, token);
         boolean expired = LocalDate.parse(reservation.getTillDate(), DateTimeFormatter.ISO_DATE).isBefore(
                 LocalDate.parse(req.getDate(), DateTimeFormatter.ISO_DATE));
 
-        ResponseEntity<String> closeResponse = closeReservation(reservationUid, expired);
+        ResponseEntity<String> closeResponse = closeReservation(reservationUid, expired, token);
         if (closeResponse.getStatusCode() != HttpStatus.NO_CONTENT)
             return HttpStatus.INTERNAL_SERVER_ERROR;
 
 
         ResponseEntity<String> libResponse = updAvailable(new TakeBookRequest(reservation.getBookUid(),
-                reservation.getLibraryUid(), reservation.getTillDate()), false);
+                reservation.getLibraryUid(), reservation.getTillDate()), false, token);
 
         if (libResponse.getStatusCode() != HttpStatus.OK)
             libraryProducer.sendMessage(reservation.getBookUid().toString(),
@@ -435,7 +450,7 @@ public class ReservationService {
             delta -= 10;
 
         ResponseEntity<LibraryBookResponse> bookInfoResponse = getLibraryBookInfo(reservation.getLibraryUid(),
-                                                            reservation.getBookUid());
+                                                            reservation.getBookUid(), token);
 
         LibraryBookResponse bookInfo = bookInfoResponse.getBody();
         if (!bookInfo.getCondition().equals(req.getCondition()))
@@ -443,10 +458,13 @@ public class ReservationService {
         else if (!expired)
             delta += 1;
 
-        ResponseEntity<String> ratingResponse = updateRating(username, delta);
-        if (ratingResponse.getStatusCode() != HttpStatus.OK)
-            ratingProducer.sendMessage(username, delta);
+        ResponseEntity<String> ratingResponse = updateRating(token, delta);
 
+        if (ratingResponse.getStatusCode() != HttpStatus.OK) {
+            JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getUsername();
+            ratingProducer.sendMessage(username, delta);
+        }
         return HttpStatus.NO_CONTENT;
     }
 }

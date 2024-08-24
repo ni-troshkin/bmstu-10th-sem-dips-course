@@ -40,12 +40,12 @@ public class RatingService {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new UserRatingResponse(0));
     }
 
-    public ResponseEntity<UserRatingResponse> getUserRating(String username) {
+    public ResponseEntity<UserRatingResponse> getUserRating(String token) {
 //        if (fallbackCnt > MAX_FALLBACK_CNT)
 //            return fallbackUserRatingResponse().getBody();
-        LOGGER.debug("Обработка рейтинга {}", username);
+        LOGGER.debug("Обработка рейтинга");
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Name", username);
+        headers.setBearerAuth(token);
 
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<UserRatingResponse> rating = null;

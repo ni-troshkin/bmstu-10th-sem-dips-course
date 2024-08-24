@@ -12,7 +12,7 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
-      - "5432:5432"
+      - "54320:5432"
 
   rating_db:
     image: nitroshkin/db-rating:${APP_VERSION}
@@ -100,6 +100,46 @@ services:
       - reservation_db
     restart: unless-stopped
 
+  stats_db:
+    image: nitroshkin/db-stats:${APP_VERSION}
+    container_name: stats_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${STATS_PG_PASSWORD}
+      POSTGRES_USER: dev
+      POSTGRES_DB: statsservice
+      PGDATA: /home/data
+      POSTGRES_INITDB_ARGS: "-A md5"
+    expose:
+      - 5435
+    ports:
+      - "54324:5432"
+    volumes:
+      - db-data:/data/lib/postgresql/data
+
+  stats_server:
+    image: nitroshkin/service-stats:${APP_VERSION}
+    container_name: stats
+    expose:
+     - 8040
+    ports:
+      - "8040:8040"
+    depends_on:
+      - stats_db
+      - kafka
+    restart: unless-stopped
+  
+  auth_server:
+    image: nitroshkin/service-auth:${APP_VERSION}
+    container_name: auth
+    expose:
+     - 8090
+    ports:
+      - "8090:8090"
+    depends_on:
+      - keycloak
+    restart: unless-stopped
+
   gateway_server:
     image: nitroshkin/service-gateway:${APP_VERSION}
     container_name: gateway
@@ -111,6 +151,8 @@ services:
       - reservation_server
       - library_server
       - rating_server
+      - auth_server
+      - stats_server
       - kafka
     restart: unless-stopped
     
@@ -148,6 +190,22 @@ services:
       KAFKA_BROKERCONNECT: "kafka:9092"
     depends_on:
       - "kafka"
+      
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.4
+    container_name: keycloak_lib
+    restart: "no"
+    expose:
+     - 8081
+    ports:
+      - "8081:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+    command: start-dev
+    volumes:
+      - keycloak-data:/opt/keycloak/data/import
 
 volumes:
   db-data:
+  keycloak-data:

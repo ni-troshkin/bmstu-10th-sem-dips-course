@@ -1,17 +1,26 @@
 package com.gatewayservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gatewayservice.config.ActionType;
 import com.gatewayservice.dto.*;
+import com.gatewayservice.jwt.JwtAuthentication;
+import com.gatewayservice.producer.StatsProducer;
 import com.gatewayservice.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @Tag(name = "RESERVATIONS")
 @RequestMapping("/reservations")
@@ -21,52 +30,99 @@ public class ReservationController {
      */
     private final ReservationService reservationService;
 
-    public ReservationController(ReservationService reservationService) {
+    private final StatsProducer producer;
+
+    public ReservationController(ReservationService reservationService, StatsProducer producer) {
         this.reservationService = reservationService;
+        this.producer = producer;
     }
 
     /**
      * Получение списка книг, взятых в прокат по имени пользователя
-     * @param username имя пользователя, информацию о котором нужно получить
      * @return список книг, взятых в прокат
      */
     @Operation(summary = "Получение списка книг, взятых пользователем в прокат")
     @GetMapping()
-    public ResponseEntity<ArrayList<BookReservationResponse>> getReservations(@RequestHeader("X-User-Name") String username) {
-        return reservationService.getAllReservations(username);
+    public ResponseEntity<ArrayList<BookReservationResponse>> getReservations() {
+        LocalDateTime startDate = LocalDateTime.now();
+
+        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getUsername();
+        String token = auth.getToken();
+        ResponseEntity<ArrayList<BookReservationResponse>> res = reservationService.getAllReservations(token);
+
+        try {
+            producer.sendMessage(
+                    new StatMessage(
+                            username, startDate, LocalDateTime.now(), ActionType.RESERVATIONS_BY_USER, null));
+        } catch (JsonProcessingException e) {
+            log.error("[GATEWAY] error sending kafka msg, {}", e.getMessage());
+        }
+
+        return res;
     }
 
     /**
      * Взять книгу в библиотеке
-     * @param username имя читателя
      * @param req информация о запросе
      * @return список книг, взятых в прокат
      */
     @Operation(summary = "Взять книгу в библиотеке")
     @PostMapping()
-    public ResponseEntity<?> takeBook(@RequestHeader("X-User-Name") String username,
-                                                     @RequestBody TakeBookRequest req) {
-        TakeBookResponse reservation = reservationService.takeBook(username, req);
+    public ResponseEntity<?> takeBook(@RequestBody TakeBookRequest req) {
+        LocalDateTime startDate = LocalDateTime.now();
+
+        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getUsername();
+        String token = auth.getToken();
+        TakeBookResponse reservation = reservationService.takeBook(token, req);
+        ResponseEntity res = null;
 
         if (reservation == null)
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse("Bonus Service unavailable"));
+            res = ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse("Service unavailable"));
+        else
+            res = ResponseEntity.status(HttpStatus.OK).body(reservation);
 
-        return ResponseEntity.status(HttpStatus.OK).body(reservation);
+        try {
+            producer.sendMessage(
+                    new StatMessage(
+                            username, startDate, LocalDateTime.now(), ActionType.CREATE_RESERVATION, req));
+        } catch (JsonProcessingException e) {
+            log.error("[GATEWAY] error sending kafka msg, {}", e.getMessage());
+        }
+
+        return res;
     }
 
     /**
      * Вернуть книгу в библиотеку
      * @param reservationUid UUID брони, которую закрывает читатель
-     * @param username имя читателя
      * @param req информация о возврате
      */
     @Operation(summary = "Вернуть книгу в библиотеку")
     @PostMapping("/{reservationUid}/return")
     public ResponseEntity<String> returnBook(@PathVariable UUID reservationUid,
-                                                   @RequestHeader("X-User-Name") String username,
                                                    @RequestBody ReturnBookRequest req) throws JsonProcessingException {
-        HttpStatus status = reservationService.returnBook(reservationUid, username, req);
+        LocalDateTime startDate = LocalDateTime.now();
 
-        return ResponseEntity.status(status).build();
+        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getUsername();
+        String token = auth.getToken();
+        HttpStatus status = reservationService.returnBook(reservationUid, token, req);
+
+        ResponseEntity<String> res = ResponseEntity.status(status).build();
+
+        try {
+            producer.sendMessage(
+                    new StatMessage(
+                            username, startDate, LocalDateTime.now(), ActionType.CLOSE_RESERVATION,
+                            new HashMap<String, UUID>() {{
+                                put("reservationUUID", reservationUid);
+                            }}));
+        } catch (JsonProcessingException e) {
+            log.error("[GATEWAY] error sending kafka msg, {}", e.getMessage());
+        }
+
+        return res;
     }
 }
