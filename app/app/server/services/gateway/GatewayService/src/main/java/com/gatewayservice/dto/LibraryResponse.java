@@ -12,12 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LibraryResponse {
-    UUID libraryUid;
+    String libraryUid;
     String name;
     String address;
     String city;
-
-    public LibraryResponse(String libraryUid) {
-        this.libraryUid = UUID.fromString(libraryUid);
-    }
 }

@@ -24,7 +24,7 @@ public class ServerApplication {
     @Bean
     Keycloak keycloak() {
         return KeycloakBuilder.builder()
-                .serverUrl("http://keycloak_lib:8080")
+                .serverUrl("http://keycloak")
                 .realm("LibraryIdentityProvider")
                 .clientId("admin-cli")
                 .grantType(OAuth2Constants.PASSWORD)

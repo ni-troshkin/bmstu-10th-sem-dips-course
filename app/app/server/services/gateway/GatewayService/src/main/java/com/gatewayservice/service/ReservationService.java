@@ -75,7 +75,9 @@ public class ReservationService {
     }
 
     private ResponseEntity<LibraryResponse> fallbackLibraryResponse(String libraryUid) {
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new LibraryResponse(libraryUid));
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                new LibraryResponse(libraryUid, null, null, null)
+        );
     }
 
     private ResponseEntity<ReservationResponse> fallbackReservationResponse(String reservationUid) {

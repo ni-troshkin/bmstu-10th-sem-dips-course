@@ -10,6 +10,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +48,10 @@ public class AuthController {
         log.info("[AUTH]: authorization request was caught.");
         LocalDateTime startDate = LocalDateTime.now();
 
-        String url = "http://localhost:8081/realms/LibraryIdentityProvider/protocol/openid-connect/auth" +
+        String url = "http://keycloak/realms/LibraryIdentityProvider/protocol/openid-connect/auth" +
                 "?response_type=code" +
                 "&client_id=" + request.getClientId() +
-                "&redirect_uri=http%3A%2F%2Flocalhost%3A8090%2Fapi%2Fv1%2Fmanage%2Fhealth" +
+                "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Ftoken" +
                 "&scope=openid" +
                 "&state=xyz";
         log.info(url);
@@ -83,17 +84,18 @@ public class AuthController {
                 "&client_id=" + request.getClientId() +
                 "&client_secret=" + request.getClientSecret() +
                 "&code=" + request.getAuthenticationCode() +
-                "&redirect_uri=http%3A%2F%2Flocalhost%3A8090%2Fapi%2Fv1%2Fmanage%2Fhealth";
+                "&redirect_uri=" + request.getRedirectUri();
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
         ResponseEntity<TokenResponse> response = null;
-        String keycloakUrl = "http://keycloak_lib:8080/realms/LibraryIdentityProvider/protocol/openid-connect/token";
+        String keycloakUrl = "http://keycloak/realms/LibraryIdentityProvider/protocol/openid-connect/token";
         try {
             response = restTemplate.exchange(
                     keycloakUrl,
                     HttpMethod.POST,
                     entity,
-                    TokenResponse.class
+                    new ParameterizedTypeReference<TokenResponse>() {
+                    }
             );
             System.out.println(response.getBody());
 //        HttpEntity<String> entity = new HttpEntity<>("body", headers);
@@ -128,7 +130,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/logout")
-    public ResponseEntity<String> token(@RequestParam String username) throws JsonProcessingException {
+    public ResponseEntity<String> logout(@RequestParam String username) throws JsonProcessingException {
         log.info("[AUTH]: logout request={} was caught.", username);
         LocalDateTime startDate = LocalDateTime.now();
 

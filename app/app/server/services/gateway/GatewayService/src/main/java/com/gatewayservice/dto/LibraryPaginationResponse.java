@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Data
@@ -16,5 +17,5 @@ public class LibraryPaginationResponse {
     int page;
     int pageSize;
     int totalElements;
-    ArrayList<LibraryResponse> items;
+    List<LibraryResponse> items;
 }

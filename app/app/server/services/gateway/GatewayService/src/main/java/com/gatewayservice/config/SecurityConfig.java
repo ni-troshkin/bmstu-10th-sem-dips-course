@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         authz -> authz
-                                .antMatchers("/v3/api-docs", "/manage/health", "/oauth/authorize", "/oauth/token", "/swagger", "/webjars/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/error", "/", "/swagger-ui/**").permitAll()
+                                .antMatchers("/v3/api-docs", "/manage/health", "/oauth/authorize", "/oauth/logout", "/oauth/token", "/swagger", "/webjars/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/error", "/", "/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)

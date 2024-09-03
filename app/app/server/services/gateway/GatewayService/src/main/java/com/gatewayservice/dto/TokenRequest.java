@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class    TokenRequest {
+public class TokenRequest {
     @JsonProperty(value = "authentication_code")
     public String authenticationCode;
 
@@ -15,4 +15,7 @@ public class    TokenRequest {
 
     @JsonProperty(value = "client_secret")
     public String clientSecret;
+
+    @JsonProperty(value = "redirect_uri")
+    public String redirectUri;
 }

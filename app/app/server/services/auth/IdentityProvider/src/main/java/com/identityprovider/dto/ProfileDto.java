@@ -18,10 +18,4 @@ public class ProfileDto {
 
     @JsonProperty(value = "username")
     public String username;
-
-    @JsonProperty(value = "mobilePhone")
-    public String mobilePhone;
-
-    @JsonProperty(value = "userType")
-    public String userType = "user";
 }

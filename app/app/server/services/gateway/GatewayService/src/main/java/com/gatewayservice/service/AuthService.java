@@ -48,13 +48,14 @@ public class AuthService {
         HttpEntity<TokenRequest> entity = new HttpEntity<>(tokenRequest);
         ResponseEntity<TokenResponse> token = null;
         try {
+            System.out.println("JOPA");
             token = restTemplate.exchange(
                     serverUrl + "/api/v1/oauth/token",
                     HttpMethod.POST,
                     entity,
-                    new ParameterizedTypeReference<TokenResponse>() {
-                    }
+                    TokenResponse.class
             );
+            System.out.println("JOPA");
 
             /*;*/
         } catch (HttpClientErrorException e) {

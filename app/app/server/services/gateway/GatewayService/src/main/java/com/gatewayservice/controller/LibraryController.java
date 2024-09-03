@@ -58,20 +58,22 @@ public class LibraryController {
 
         ResponseEntity<LibraryPaginationResponse> res;
         if (status != HttpStatus.OK)
-            res = ResponseEntity.status(status).build();
+            return ResponseEntity.status(status).build();
 
         if (page == null)
             res = ResponseEntity.status(status).body(new LibraryPaginationResponse(1, 1, allLibs.size(), allLibs));
 
-        int maxPage = allLibs.size() / size + 1;
+        else {
+            int maxPage = allLibs.size() / size + 1;
 
-        if (page > maxPage)
-            page = maxPage;
+            if (page > maxPage)
+                page = maxPage;
 
-        ArrayList<LibraryResponse> pageLibs =
-                new ArrayList<>(allLibs.subList((page - 1) * size, Integer.min(page * size, allLibs.size())));
+            ArrayList<LibraryResponse> pageLibs =
+                    new ArrayList<>(allLibs.subList((page - 1) * size, Integer.min(page * size, allLibs.size())));
 
-        res = ResponseEntity.status(status).body(new LibraryPaginationResponse(page, size, allLibs.size(), pageLibs));
+            res = ResponseEntity.status(status).body(new LibraryPaginationResponse(page, size, allLibs.size(), pageLibs));
+        }
 
         try {
             Integer finalPage = page;
@@ -99,10 +101,10 @@ public class LibraryController {
      */
     @Operation(summary = "Получить список книг в библиотеке")
     @GetMapping("/{libraryUid}/books")
-    public ResponseEntity<LibraryBookPaginationResponse> updateRating(@PathVariable UUID libraryUid,
+    public ResponseEntity<LibraryBookPaginationResponse> getBooksInLibrary(@PathVariable UUID libraryUid,
                                                                       @RequestParam(value = "page", required = false) Integer page,
                                                                       @RequestParam(value = "size", required = false) Integer size,
-                                                                      @RequestParam(value = "showAll", required = false, defaultValue = "true") boolean showAll)  {
+                                                                      @RequestParam(value = "showAll", required = false, defaultValue = "false") boolean showAll)  {
         LocalDateTime startDate = LocalDateTime.now();
         JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
         String token = auth.getToken();

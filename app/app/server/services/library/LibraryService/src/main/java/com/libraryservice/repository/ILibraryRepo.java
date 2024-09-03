@@ -23,9 +23,10 @@ public interface ILibraryRepo {
     /**
      * Получение списка книг в выбранной библиотеке
      * @param libraryUid UUID библиотеки, в которой хотим получить список книг
+     * @param showAll флаг, показывать ли недоступные книги
      * @throws SQLException при неуспешном подключении или внутренней ошибке базы данных
      */
-    public ArrayList<Book> getBooksByLibrary(UUID libraryUid) throws SQLException;
+    public ArrayList<Book> getBooksByLibrary(UUID libraryUid, boolean showAll) throws SQLException;
 
     /**
      * Взятие книги в библиотеке (уменьшение поля available_cnt)

@@ -41,8 +41,8 @@ public class LibraryService {
      * @param libraryUid UUID библиотеки, в которой хотим получить список книг
      * @throws SQLException при неуспешном подключении или внутренней ошибке базы данных
      */
-    public ArrayList<Book> getBooksByLibrary(UUID libraryUid) throws SQLException {
-        return repo.getBooksByLibrary(libraryUid);
+    public ArrayList<Book> getBooksByLibrary(UUID libraryUid, boolean showAll) throws SQLException {
+        return repo.getBooksByLibrary(libraryUid, showAll);
     }
 
     /**

@@ -1,40 +1,23 @@
 package com.gatewayservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.*;
 
+@Getter
 @Data
-@Accessors(chain = true)
-@ToString
-@JsonIgnoreProperties
+@AllArgsConstructor
+@NoArgsConstructor
 public class TokenResponse {
-    @JsonProperty(value = "access_token")
-    public String accessToken;
+    String access_token;
+    int expires_in;
+    int refresh_expires_in;
+    String refresh_token;
+    String token_type;
+    String id_token;
 
-    @JsonProperty(value = "expires_in")
-    public Integer expiresIn;
+    @JsonProperty(value = "not-before-policy")
+    int not_before_policy;
 
-    @JsonProperty(value = "refresh_expires_in")
-    public Integer refreshExpiresIn;
-
-    @JsonProperty(value = "refresh_token")
-    public String refreshToken;
-
-    @JsonProperty(value = "token_type")
-    public String tokenType;
-
-    @JsonProperty(value = "id_token")
-    public String idToken;
-
-    @JsonProperty(value = "not_before_policy")
-    public Integer notBeforePolicy;
-
-    @JsonProperty(value = "session_state")
-    public String sessionState;
-
-    @JsonProperty(value = "scope")
-    public String scope;
+    String session_state;
+    String scope;
 }

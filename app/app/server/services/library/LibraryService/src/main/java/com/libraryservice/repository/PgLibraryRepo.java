@@ -43,7 +43,7 @@ public class PgLibraryRepo implements ILibraryRepo {
         while (rs.next())
         {
             Library lib = new Library(rs.getInt("id"),
-                                        rs.getObject("library_uid", java.util.UUID.class),
+                                        rs.getObject("library_uid", java.util.UUID.class).toString(),
                                         rs.getString("name"), rs.getString("city"),
                                         rs.getString("address"));
             libs.add(lib);
@@ -58,13 +58,14 @@ public class PgLibraryRepo implements ILibraryRepo {
      * @throws SQLException при неуспешном подключении или внутренней ошибке базы данных
      */
     @Override
-    public ArrayList<Book> getBooksByLibrary(UUID libraryUid) throws SQLException {
+    public ArrayList<Book> getBooksByLibrary(UUID libraryUid, boolean showAll) throws SQLException {
         ArrayList<Book> books = new ArrayList<>();
+        String extraFilter = (showAll) ? "" : " AND lb.available_count > 0";
 
         String getBooks = "SELECT b.id, b.book_uid, b.name, author, genre, condition, lb.available_count " +
                 "FROM public.books b JOIN public.library_books lb ON b.id = lb.book_id " +
                 "JOIN public.library l ON lb.library_id = l.id " +
-                "WHERE l.library_uid = ?::uuid";
+                "WHERE l.library_uid = ?::uuid" + extraFilter;
 
         PreparedStatement booksQuery = conn.prepareStatement(getBooks);
         booksQuery.setString(1, libraryUid.toString());
@@ -91,8 +92,9 @@ public class PgLibraryRepo implements ILibraryRepo {
      */
     @Override
     public void takeBook(UUID libraryUid, UUID bookUid) throws SQLException, BookIsNotAvailable {
-        conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         conn.setAutoCommit(false);
+        conn.commit();
+        conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
         if (!isAvailable(libraryUid, bookUid))
             throw new BookIsNotAvailable("Нет свободной книги в выбранной библиотеке");
@@ -111,8 +113,8 @@ public class PgLibraryRepo implements ILibraryRepo {
         updAvailable.executeUpdate();
 
         conn.commit();
-        conn.setAutoCommit(true);
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+        conn.setAutoCommit(true);
     }
 
     /**
@@ -232,7 +234,7 @@ public class PgLibraryRepo implements ILibraryRepo {
 
         if (rs.next())
             lib = new Library(rs.getInt("id"),
-                    rs.getObject("library_uid", java.util.UUID.class),
+                    rs.getObject("library_uid", java.util.UUID.class).toString(),
                     rs.getString("name"), rs.getString("city"),
                     rs.getString("address"));
 

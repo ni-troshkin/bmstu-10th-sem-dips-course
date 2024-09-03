@@ -92,11 +92,12 @@ public class LibraryController {
      */
     @Operation(summary = "Получить список книг в библиотеке")
     @GetMapping("/libraries/{libraryUid}/books")
-    public ResponseEntity<ArrayList<LibraryBookResponse>> getBooksByLibrary(@PathVariable UUID libraryUid) throws SQLException {
+    public ResponseEntity<ArrayList<LibraryBookResponse>> getBooksByLibrary(@PathVariable UUID libraryUid,
+                                                                            @RequestParam boolean showAll) throws SQLException {
         LocalDateTime startDate = LocalDateTime.now();
         JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getUsername();
-        ArrayList<Book> books = libraryService.getBooksByLibrary(libraryUid);
+        ArrayList<Book> books = libraryService.getBooksByLibrary(libraryUid, showAll);
 
         ArrayList<LibraryBookResponse> allBooks = new ArrayList<>();
         for (Book b : books) {

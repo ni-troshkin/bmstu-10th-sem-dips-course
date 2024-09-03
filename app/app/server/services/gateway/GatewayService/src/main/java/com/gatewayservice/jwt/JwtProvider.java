@@ -43,7 +43,7 @@ public class JwtProvider {
         try {
             DecodedJWT jwt = JWT.decode(token);
             JwkProvider provider = new JwkProviderBuilder(
-                    new URL("http://keycloak_lib:8080/realms/LibraryIdentityProvider/protocol/openid-connect/certs")
+                    new URL("http://keycloak/realms/LibraryIdentityProvider/protocol/openid-connect/certs")
             ).rateLimited(false).cached(false).build();
             Jwk jwk = provider.get(jwt.getKeyId());
             System.out.println(jwt.getKeyId());
@@ -85,10 +85,10 @@ public class JwtProvider {
         return false;
     }
 
-    public Claims getClaims(@NonNull String token) throws JwkException, MalformedURLException {
+    public static Claims getClaims(@NonNull String token) throws JwkException, MalformedURLException {
         DecodedJWT jwt = JWT.decode(token);
         JwkProvider provider = new JwkProviderBuilder(
-                new URL("http://keycloak_lib:8080/realms/LibraryIdentityProvider/protocol/openid-connect/certs")
+                new URL("http://keycloak/realms/LibraryIdentityProvider/protocol/openid-connect/certs")
         ).rateLimited(false).cached(false).build();
         JacksonDeserializer<Map<String, ?>> des = new JacksonDeserializer<Map<String, ?>>(Map.of("realm_access", RealmRole.class));
         Jwk jwk = provider.get(jwt.getKeyId());

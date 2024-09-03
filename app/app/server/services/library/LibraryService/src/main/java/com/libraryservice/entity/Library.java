@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Library {
     int id;
-    UUID libraryUid;
+    String libraryUid;
     String name;
     String city;
     String address;

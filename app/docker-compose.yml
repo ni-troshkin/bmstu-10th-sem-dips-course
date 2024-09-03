@@ -205,6 +205,17 @@ services:
     command: start-dev
     volumes:
       - keycloak-data:/opt/keycloak/data/import
+      
+  # client:
+  #  image: nitroshkin/library-client:${APP_VERSION}
+  #  container_name: client
+  #  expose:
+  #   - 3000
+  #  ports:
+  #    - "3000:3000"
+  #  depends_on:
+  #    - gateway_server
+  #  restart: unless-stopped
 
 volumes:
   db-data:

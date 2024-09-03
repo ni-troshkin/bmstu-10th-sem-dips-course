@@ -15,4 +15,7 @@ public class TokenRequest {
 
     @JsonProperty(value = "client_secret")
     public String clientSecret;
+
+    @JsonProperty(value = "redirect_uri")
+    public String redirectUri;
 }

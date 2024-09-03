@@ -1,19 +1,23 @@
 package com.gatewayservice.controller;
 
+import com.auth0.jwk.JwkException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gatewayservice.config.ActionType;
 import com.gatewayservice.dto.*;
 import com.gatewayservice.jwt.JwtAuthentication;
+import com.gatewayservice.jwt.JwtProvider;
 import com.gatewayservice.producer.StatsProducer;
 import com.gatewayservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,9 +70,10 @@ public class AuthController {
      */
     @Operation(summary = "Запрос токена")
     @PostMapping("/token")
-    public ResponseEntity<TokenResponse> token(@RequestBody TokenRequest req) {
+    public ResponseEntity<TokenResponseDto> token(@RequestBody TokenRequest req) throws JwkException, MalformedURLException {
         LocalDateTime startDate = LocalDateTime.now();
         ResponseEntity<TokenResponse> res = authService.token(req);
+        String username = JwtProvider.getClaims(res.getBody().getAccess_token()).get("preferred_username").toString();
         try {
             producer.sendMessage(
                     new StatMessage(
@@ -76,7 +81,9 @@ public class AuthController {
         } catch (JsonProcessingException e) {
             log.error("[GATEWAY] error sending kafka msg, {}", e.getMessage());
         }
-        return res;
+        return ResponseEntity.status(res.getStatusCode()).body(
+                new TokenResponseDto(res.getBody(), username)
+        );
     }
 
     /**
@@ -85,12 +92,12 @@ public class AuthController {
      */
     @Operation(summary = "Выход")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(@RequestParam String username) {
         LocalDateTime startDate = LocalDateTime.now();
-        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getUsername();
+//        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+//        String username = auth.getUsername();
 
-        ResponseEntity<String> res = authService.logout(username);
+        ResponseEntity<String> res = ResponseEntity.status(HttpStatus.OK).body(authService.logout(username).getBody());
         try {
             producer.sendMessage(
                     new StatMessage(
