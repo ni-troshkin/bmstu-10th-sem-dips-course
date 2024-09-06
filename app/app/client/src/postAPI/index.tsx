@@ -10,7 +10,7 @@ import { LibraryBookResponse } from "types/LibraryBookResponse";
 import { TokenResponse } from "types/TokenResponse";
 import { AxiosResponseHeaders } from "axios";
 
-export const backUrl = "http://89.208.209.201.nip.io/api/v1";
+export const backUrl = "http://localhost:8080/api/v1";
 
 const axiosBackend = () => {
     let instance = axios.create({

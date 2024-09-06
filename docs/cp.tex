@@ -136,33 +136,12 @@ texcl=true
 \newpage
 \setcounter{page}{3}
 \begin{large}
-    \section*{РЕФЕРАТ}
-\addcontentsline{toc}{section}{РЕФЕРАТ}
-Расчетно-пояснительная записка 28 с., 8 рис., 1 табл., 17 ист.
-
-Курсовая работа представляет собой разработку модели, позволяющей по тексту статьи на английском языке подобрать к ней один или несколько тегов. 
-Проводится обзор и сравнение методов векторизации текста и моделей многозначной классификации для решения поставленной задачи. 
-Разрабатывается программное обеспечение, реализующее методы векторизации TF-IDF и Word2Vec, а также два разных варианта ансамбля бинарных классификаторов.
-Выбираются функционалы качества и на основе разработанного ПО сравниваются несколько моделей.
-
-КЛЮЧЕВЫЕ СЛОВА
-
-\textit{Машинное обучение, обработка текстов, многозначная классификация, векторизация, подбор тегов, Word2Vec, TF-IDF, ансамбль классификаторов.}
-
-\newpage
 \def\contentsname{СОДЕРЖАНИЕ}
 \tableofcontents
 
 \newpage
 \section*{ВВЕДЕНИЕ}
 \addcontentsline{toc}{section}{ВВЕДЕНИЕ}
-Фитнес-индустрия в России продолжает стремительно развиваться, фитнес перестал быть просто модным хобби и стал неотъемлемой частью здорового образа жизни.
-По данным исследования, подготовленного аналитической компанией FitnessData, занимающейся исследованием рынков фитнес-услуг в России и за рубежом, объем рынка фитнес-услуг в РФ за 2023 год увеличился на 18\% и составил не менее 214 млрд рублей. 
-Этот рост связан как с повышением цен на данный вид услуг (на 11-12\%), так и с повышением численности занимающихся (с 6 млн человек в 2022 г. до 6.5 млн человек в 2023 г.).
-
-В Москве насчитывается более тысячи фитнес-клубов, и потенциальным клиентам требуется много времени, чтобы подобрать клуб, который бы лучше всего подходил под их запросы. 
-По этой причине есть необходимость в агрегаторе, содержащем информацию о клубах и упрощающем поиск нужного для пользователя.
-
 Целью данной работы является разработка распределенной системы бронирования книг в библиотеках. 
 Для достижения поставленной цели необходимо решить следующие задачи:
 
@@ -194,7 +173,7 @@ texcl=true
 \subsection{Общие требования к системе}
 Требования к системе следующие:
 \begin{enumerate}
-	\item Разрабатываемое ПО должно поддерживать функционирование системы в режиме 24/7/365 (24 часа, 7 дней в неделю, 365 дней в году) со среднегодовым временем доступности не менее 99.9\%. Допустимое время, в течении которого система недоступна, за год должна составлять $24\cdot365\cdot0.001=8.76$ ч.
+	\item Разрабатываемое ПО на рекомендованной аппаратной конфигурации должно поддерживать функционирование системы в режиме 24/7/365 (24 часа, 7 дней в неделю, 365 дней в году) со среднегодовым временем доступности не менее 99.9\%. Допустимое время, в течении которого система недоступна, за год должна составлять $24\cdot365\cdot0.001=8.76$ ч.
 	
 	\item Время восстановления системы после сбоя не должно превышать 15 минут.
 	
@@ -427,7 +406,7 @@ texcl=true
 \end{longtable}
 
 \subsection{Топология Системы}
-На рисунке \ref{fig:topology} изображён один из возможных вариантов  топологии разрабатываемой распределенной Системы.
+На рисунке \ref{fig:topology} изображён один из возможных вариантов топологии разрабатываемой распределенной Системы.
 \begin{figure}[h]
 	\begin{center}
 		% {\includegraphics[scale = 0.6]{img/pic/topology.pdf}}
@@ -485,13 +464,13 @@ texcl=true
 	\item Система состоит из микросервисов. Каждый микросервис отвечает за свою область логики работы приложения. Сервисы должны быть запущены изолированно друг от друга.
 	\item При необходимости, каждый сервис имеет своё собственное хранилище, запросы между базами запрещены.
 	\item Необходимо реализовать один web-интерфейс для фронтенда в виде SPA или мобильного клиента с обязательным использованием CSS.  Интерфейс  должен  быть  доступен  через  тонкий  клиент (браузер).
-	\item Взаимодействие между сервисами осуществляется посредством HTTP-запросов и/или очереди сообщений по технологии REST.
+	\item Взаимодействие между сервисами осуществляется посредством HTTP-запросов и/или очереди сообщений по технологии REST [1].
 	\item Требуется выделить Gateway Service как единую точку входа и межсервисной коммуникации. В системе не должно осуществляться горизонтальных запросов.
-	\item На Gateway Service для всех операций чтения реализовать паттерн Circuit Breaker. Накапливать статистику в памяти, и если система не ответила N раз, то в N + 1 раз вместо запроса сразу отдавать fallback. Через небольшой timeout выполнить запрос к реальной системе, чтобы проверить ее состояние.
+	\item На Gateway Service для всех операций чтения реализовать паттерн Circuit Breaker [2]. Накапливать статистику в памяти, и если система не ответила N раз, то в N + 1 раз вместо запроса сразу отдавать fallback. Через небольшой timeout выполнить запрос к реальной системе, чтобы проверить ее состояние.
 	\item При недоступности подсистем должна осуществляться деградация функциональности (если подсистема некритичная) или выдача пользователю сообщения об ошибке и полный откат операции (либо постановка запроса в очередь для повторного выполнения и возврат пользователю сообщения об успехе).
 	\item Все методы /api/** (кроме /api/v1/authorize и /api/v1/callback) на всех сервисах должны быть закрыты token-based авторизацией.
-	\item Если авторизация некорректная (отсутствие токена, ошибка валидации JWT токена, закончилось время жизни токена (поле exp в payload)), то отдавать 401 ошибку.
-	\item Развертывание приложения выполнить с использованием Managed Kubernetes Cluster и настроить Ingress Controller (для публикации сервисов наружу можно использовать только Ingress). Для деплоя использовать helm charts, они должны быть универсальными для всех сервисов и отличаться лишь набором параметров запуска. Сервисы должны быть завернуты в docker.
+	\item Если авторизация некорректная (отсутствие токена, ошибка валидации JWT токена [3], закончилось время жизни токена (поле exp в payload)), то отдавать 401 ошибку.
+	\item Развертывание приложения выполнить с использованием Managed Kubernetes Cluster [4] и настроить Ingress Controller [5] (для публикации сервисов наружу можно использовать только Ingress). Для деплоя использовать helm charts [6], они должны быть универсальными для всех сервисов и отличаться лишь набором параметров запуска. Сервисы должны быть завернуты в docker.
 \end{enumerate}
 
 \subsection{Функциональные требования к подсистемам}
@@ -538,8 +517,8 @@ texcl=true
 \begin{itemize}
 	\item[---] принимать и возвращать данные в формате JSON по протоколу HTTP;
 	\item[---] возможность регистрации нового клиента и обновление данных уже существующего;
-	\item[---] выполнять функцию Identity Provider с использованием протокола OpenID Connect (scope: openid, profile, email);
-	\item[---] для получения токена на Identity Provider должен быть реализован Authorization Flow (UI рассматривается как 3rd party application и авторизация пользователя так же выполняется через Authorization Flow).
+	\item[---] выполнять функцию Identity Provider с использованием протокола OpenID Connect [7] (scope: openid, profile, email);
+	\item[---] для получения токена на Identity Provider должен быть реализован Authorization Flow [8] (UI рассматривается как 3rd party application и авторизация пользователя так же выполняется через Authorization Flow).
 \end{itemize}
 
 \textbf{Сервис объектов библиотеки} реализует следующие функции:
@@ -568,7 +547,7 @@ texcl=true
     \item[---] создание и обновление записей о бронировании в базе данных при взятии книги из библиотеки или возврате в библиотеку.
 \end{itemize}
 
-\textbf{Сервис статистики} получает через Kafka информацию о выполненных действиях и по этим данным строит отчет для администратора и валидирует его JWT-токен.
+\textbf{Сервис статистики} получает через Kafka [9] информацию о выполненных действиях и по этим данным строит отчет для администратора и валидирует его JWT-токен.
 
 \newpage
 
@@ -580,6 +559,19 @@ texcl=true
 
 Для уточнения деталей по операции бронирования книги, отображённой на диаграмме верхнего уровня, используется дочерняя диаграмма, которая изображена на рисунке \ref{fig:idef0-2}. 
 Она определяет последовательность выполнения операций в системе при обработке запроса клиента. 
+
+
+\subsection{UML-диаграммы}
+В системе выделены три роли: Пользователь, Клиент, Администратор. 
+На рисунках \ref{fig:use-case-user}, \ref{fig:use-case-client}-\ref{fig:use-case-admin} представлены диаграммы прецедентов для каждой из ролей. 
+
+\begin{figure}[h]
+	\begin{center}
+		{\includegraphics[scale = 1.1]{UseCaseUser}}
+		\caption{Диаграмма прецедентов с точки зрения пользователя}
+		\label{fig:use-case-user}
+	\end{center}
+\end{figure}
 
 \newpage
 \begin{landscape}
@@ -597,21 +589,9 @@ texcl=true
 \end{landscape}
 
 
-\subsection{Диаграммы прецедентов}
-В системе выделены три роли: Пользователь, Клиент, Администратор. 
-На рисунках \ref{fig:use-case-user}-\ref{fig:use-case-admin} представлены диаграммы прецедентов для каждой из ролей. 
-
 \begin{figure}[h]
 	\begin{center}
-		{\includegraphics[scale = 1.1]{UseCaseUser}}
-		\caption{Диаграмма прецедентов с точки зрения пользователя}
-		\label{fig:use-case-user}
-	\end{center}
-\end{figure}
-
-\begin{figure}[h]
-	\begin{center}
-		{\includegraphics[scale = 0.66]{UseCaseClient}}
+		{\includegraphics[scale = 0.6]{UseCaseClient}}
 		\caption{Диаграмма прецедентов с точки зрения клиента.}
 		\label{fig:use-case-client}
 	\end{center}
@@ -619,15 +599,13 @@ texcl=true
 
 \begin{figure}[h!]
 	\begin{center}
-		{\includegraphics[scale = 0.66]{UseCaseAdmin}}
+		{\includegraphics[scale = 0.6]{UseCaseAdmin}}
 		\caption{Диаграмма прецедентов с точки зрения администратора.}
 		\label{fig:use-case-admin}
 	\end{center}
 \end{figure}
 
 \pagebreak
-\subsection{UML-диаграммы}
-
 
 На рисунке \ref{fig:schema-reservation} представлена диаграмма деятельности в режиме <<Бронирование книги>> для клиента.
 
@@ -668,305 +646,359 @@ texcl=true
 
 \pagebreak
 
+\subsection{Спецификация классов}
+На рисунке \ref{fig:diag-classes} представлена диаграмма классов, принадлежащих основным компонентам микросервиса объектов библиотек.
+
+\begin{figure}[h!]
+	\begin{center}
+		{\includegraphics[scale = 0.5]{UML_Class}}
+		\caption{Диаграмма классов}
+		\label{fig:diag-classes}
+	\end{center}
+\end{figure}
+
+
+Классы Library, Book, BookLibrary представляют легковесные объекты бизнес-логики, ассоциированные с соответствующими сущностями базы данных. 
+Атрибуты указанных классов представлены в таблицах \ref{tbl:club}-\ref{tbl:registered}.
+
+\begin{longtable}{| p{3cm} | p{5cm} | p{8cm} |}
+	\caption{Атрибуты класса Library}
+	\label{tbl:club} \\
+	\hline
+	
+	\multicolumn{3}{|c|}{\textbf{Атрибуты}} \\
+	\hline
+	
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endfirsthead
+	
+	\hline
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endhead
+	
+	\hline
+	\multicolumn{3}{c}{\textit{Продолжение на следующей странице}}
+	\endfoot
+	\hline
+	\endlastfoot
+	
+	id
+	&
+	private: int
+	&
+	идентификатор библиотеки в БД\\
+	\hline
+	
+	libraryUid
+	&
+	private: String
+	&
+	UUID библиотеки \\
+	\hline
+	
+	address
+	&
+	private: String
+	&
+	адрес \\
+	\hline
+
+	city
+	&
+	private: String
+	&
+	город \\
+	\hline
+	
+	name
+	&
+	private: String
+	&
+	название библиотеки \\
+\end{longtable}
+
+\begin{longtable}{| p{3cm} | p{5cm} | p{8cm} |}
+	\caption{Атрибуты класса Book}
+	\label{tbl:abonement} \\
+	\hline
+	
+	\multicolumn{3}{|c|}{\textbf{Атрибуты}} \\
+	\hline
+	
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endfirsthead
+	
+	\hline
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endhead
+	
+	\hline
+	\multicolumn{3}{c}{\textit{Продолжение на следующей странице}}
+	\endfoot
+	\hline
+	\endlastfoot
+	
+	id
+	&
+	private: int
+	&
+	идентификатор книги в БД \\
+	\hline
+	
+	bookUid
+	&
+	private: UUID
+	&
+	UUID книги \\
+	\hline
+	
+	name
+	&
+	private: String
+	&
+	название книги \\
+	\hline
+	
+	author
+	&
+	private: String
+	&
+	автор \\
+	\hline
+	
+	genre
+	&
+	private: String
+	&
+	жанр книги \\
+	\hline
+	
+	condition
+	&
+	private: Condition
+	&
+	состояние книги (enum: плохое, хорошее, отличное) \\
+\end{longtable}
+
+\begin{longtable}{| p{3cm} | p{5cm} | p{8cm} |}
+	\caption{Атрибуты класса BookLibrary}
+	\label{tbl:registered} \\
+	\hline
+	
+	\multicolumn{3}{|c|}{\textbf{Атрибуты}} \\
+	\hline
+	
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endfirsthead
+	
+	\hline
+	\textbf{Имя} & \textbf{Тип} & \textbf{Описание} \\
+	\hline
+	\endhead
+	
+	\hline
+	\multicolumn{3}{c}{\textit{Продолжение на следующей странице}}
+	\endfoot
+	\hline
+	\endlastfoot
+	
+	libraryUid
+	&
+	private: UUID
+	&
+	UUID библиотеки \\
+	\hline
+	
+	bookUid
+	&
+	private: UUID
+	&
+	UUID книги \\
+	\hline
+	
+	availableCnt
+	&
+	private: int
+	&
+	количество доступных экземпляров данной книги в данной библиотеке \\
+\end{longtable}
+
+Классы LibraryResponse, BookInfo, LibraryBookResponse, ReturnBookRequest представляют объекты для передачи данных между сервисами. 
+Атрибутивный состав LibraryResponse, BookInfo, LibraryBookResponse аналогичен составу ассоциированных с ними сущностей базы данных. 
+
+Класс PgLibraryRepo отвечает за взаимодействие микросервиса с базой данных. 
+Его методы приведены в таблице \ref{tbl:clubrepository}.
+
+\begin{longtable}{| p{8cm} | p{8cm} |}
+	\caption{Атрибуты класса PgLibraryRepo}
+	\label{tbl:clubrepository} \\
+	\hline
+	
+	\multicolumn{2}{|c|}{\textbf{Методы}} \\
+	\hline
+	
+	\textbf{Название} & \textbf{Описание} \\
+	\hline
+	\endfirsthead
+	
+	\hline
+	\textbf{Название} & \textbf{Описание} \\
+	\hline
+	\endhead
+	
+	\hline
+	\multicolumn{2}{c}{\textit{Продолжение на следующей странице}}
+	\endfoot
+	\hline
+	\endlastfoot
+	
+	getLibrariesByCity(String): Library[]
+	&
+	param: [String - in] - город \newline
+	\textit{получение информации о библиотеках в городе}\\
+	\hline
+	
+	getBooksByLibrary(UUID, boolean): Book[]
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	param: showAll [boolean - in] - флаг, если установлен, получить даже книги, которых нет в наличии \newline
+	\textit{получение информации о фитнес-клубе по его идентификатору}\\
+	\hline
+	
+	takeBook(UUID, UUID): void
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	param: bookUid [UUID - in] - идентификатор книги \newline
+	\textit{уменьшение числа доступных экземпляров взятой книги в выбранной библиотеке}\\
+	\hline
+	
+	returnBook(UUID, UUID): void
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	param: bookUid [UUID - in] - идентификатор книги \newline
+	\textit{увеличение числа доступных экземпляров возвращенной книги в библиотеке}\\
+	\hline
+	
+	isAvailable(UUID, UUID): boolean
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	param: bookUid [UUID - in] - идентификатор книги \newline
+	\textit{проверка наличия книги в библиотеке}\\
+	\hline
+	
+	getLibraryBookInfo(UUID, UUID): Book
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	param: bookUid [UUID - in] - идентификатор книги \newline
+	\textit{получение полной информации о книге в библиотеке}\\
+	\hline
+	
+	getBookInfo(UUID): Book
+	&
+	param: bookUid [UUID - in] - идентификатор книги \newline
+	\textit{получение полной информации о книге}\\
+	\hline
+	
+	getLibraryInfo(UUID): Library
+	&
+	param: libraryUid [UUID - in] - идентификатор библиотеки  \newline
+	\textit{получение полной информации о библиотеке}\\
+\end{longtable}
+
+Класс LibraryService реализует бизнес-логику микросервиса, преобразование данных и передачу их на последующий слой, непосредственно связанный с базой данных, поэтому предоставляемые им методы схожи с методами класса PgLibraryRepo.
+
+Классы LibraryController, BookController выполняют функцию преобразования транспортных сущностей в сущности базы данных и передачу запроса на уровень сервисов, а также формирование HTTP-ответа.
+Класс Consumer отвечает за обработку очереди сообщений в Kafka, куда попадают не обработанные сразу запросы о возврате книги.
+
 \newpage
 
 \section{Технологический раздел}
-\subsection{Выбор языка и среды программирования}
-В качестве языка программирования был выбран язык Python [9]. 
-Язык пользуется популярностью у исследователей и разработчиков моделей машинного обучения благодаря своей простоте и лаконичности, что позволяет быстро разрабатывать сложные алгоритмы. 
-Это привело к появлению множества библиотек и фреймворков, значительно упрощающих разработку программного обеспечения.
+\subsection{Средства разработки}
+\subsubsection{Выбор СУБД}
 
-В качестве среды разработки была выбрана Visual Studio Code [10]. 
-Она бесплатная, кроссплатформенная, также предоставляет возможность установки дополнений, например, подсветку синтаксиса и статический анализатор кода.
-
-В программе были использованы следующие библиотеки:
+В  соответствии  с  техническим  заданием  разработка  бекенда предусматривает следующие требования.
 \begin{itemize}
-    \item[---] scikit-learn;
-    \item[---] gensim;
-    \item[---] pandas;
-    \item[---] matplotlib;
-    \item[---] numpy;
-    \item[---] skops.
-\end{itemize}
-Библиотека scikit-learn [11] используется для обучения модели, так как в ней присутствуют встроенные алгоритмы для многозначной классификации, а также встроенные метрики для оценки качества полученной модели.
-
-Библиотека gensim [12] необходима для реализации векторизации методом Word2Vec. 
-Помимо инструментов для данного типа векторизации, библиотека предоставляет доступ к предобученным нейронным сетям, которые можно использовать в Word2Vec.
-
-Библиотека pandas [13] предназначена для работы с данными. 
-Она предоставляет высокоуровневые структуры данных, которые облегчают обработку, манипуляцию и анализ данных, а также включает в себя широкое множество функций для работы с ними.
-
-Matplotlib [14] предоставляет инструменты для остроения графиков, диаграмм и других видов визуализации данных.
-
-Skops [15] --- это библиотека, предназначенная для работы с моделями машинного обучения, созданными с использованием scikit-learn. 
-Она используется для сохранения и загрузки моделей.
-
-Библиотека numpy [16] создана для работы с массивами и матрицами, а также для выполнения математических и логических операций над ними. 
-Она используется, так как поддерживается многими другими библиотеками, в том числе описанными выше.
-
-\subsection{Код программы}
-
-\subsubsection{Обработка текста}
-В листингах 1-2 приводится код модуля, отвечающего за векторизацию текста.
-Реализованы два метода векторизации --- TF-IDF и Word2Vec.
-\captionsetup{singlelinecheck=false, justification=raggedleft}
-\begin{lstlisting}[caption={Модуль обработки текста}]
-import nltk
-import re
-import numpy as np
-import pandas as pd
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import normalize
-from nltk.corpus import stopwords
-from gensim.models import Word2Vec, KeyedVectors
-from gensim import downloader
-import skops.io as sio
-
-stopWords = stopwords.words("english")
-
-def delete_stop_words(text):
-    return [word for word in text if word not in stopWords]
-
-def format_data(text):
-    fmtTextStr = re.sub(r'[^\w\s]', ' ', text.lower(), flags=re.UNICODE)
-    tokenTextArr = nltk.word_tokenize(fmtTextStr)
-    cleanTextArr = delete_stop_words(tokenTextArr)
-    return " ".join(cleanTextArr)
-\end{lstlisting}
-\begin{lstlisting}[caption={Модуль обработки текста}]
-def vectorize_tf_idf(data):
-    vocabulary = None
-    try:
-        vocabulary = sio.load("model/vocab.skops")
-    except:
-        pass
-    vectorizer = TfidfVectorizer(sublinear_tf=True, min_df=0.01, max_df=0.95, stop_words=stopWords, vocabulary=vocabulary)
-    x = vectorizer.fit_transform(data['text'])
-    sio.dump(vectorizer.vocabulary_, "model/vocab.skops")
-    return x
-
-def _preprocess(s):
-    return [i for i in s.split()]
-
-def _get_vector(s, model):
-    try:
-        return np.sum(np.array([model[i] for i in _preprocess(s) if i in model]), axis=0)
-    except:
-        return 0
-
-def vectorize_word2vec(data):
-    w2v_model = downloader.load('word2vec-google-news-300')
-    x = [_get_vector(text, w2v_model) for text in data["text"]]
-    return normalize(x)
-
-def vectorize(data, mode):
-    if isinstance(data, str):
-        data = pd.DataFrame({"text": [data]})
-    
-    data["text"] = data.text.apply(lambda text: format_data(text))
-
-    if mode == "tf-idf":
-        return vectorize_tf_idf(data)
-
-    return vectorize_word2vec(data)    
-\end{lstlisting}
-
-\subsubsection{Работа с моделями}
-В листингах 3-6 приводятся фрагменты кода модуля, отвечающего за модели.
-Помимо кода ниже, в модуле реализованы экспорт и импорт моделей из файлов.
-\newpage
-\begin{lstlisting}[caption={Обучение независимых классификаторов}]
-import skops.io as sio
-import numpy as np
-import pandas as pd
-
-from sklearn.multioutput import MultiOutputClassifier, ClassifierChain
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score
-from sklearn.model_selection import train_test_split
-
-PRED_OK = 0.5
-
-def import_model(filename):
-    unknown_types = sio.get_untrusted_types(file=filename)
-    return sio.load(filename, trusted=unknown_types)
-
-def export_model(model, filename):
-    obj = sio.dump(model, filename)
-
-def train_moc(data, labels, test_size):
-    X_train, X_test, Y_train, Y_test = train_test_split(data, labels, test_size=test_size)
-    clf = MultiOutputClassifier(LogisticRegression())
-    model = clf.fit(X_train, Y_train)
-
-    predicted_y = model.predict(X_test)
-    Y_test_arr = np.array(Y_test).reshape(1, -1)[0]
-    predicted_y_arr = predicted_y.reshape(1, -1)[0]
-
-    return {
-        "model": model,
-        "precision": precision_score(Y_test_arr, predicted_y_arr),
-        "recall": recall_score(Y_test_arr, predicted_y_arr),
-        "accuracy": accuracy_score(Y_test_arr, predicted_y_arr),
-        "jaccard": jaccard_score(Y_test_arr, predicted_y_arr)
-    }
-
-def train(data, labels, test_size, chains_amt=0):
-    if chains_amt == 0:
-        return train_moc(data, labels, test_size)
-
-    return train_chain(data, labels, test_size, chains_amt)
-\end{lstlisting}
-\newpage
-\begin{lstlisting}[caption={Обучение цепочки классификаторов}]
-    def train_chain(data, labels, test_size, chains_amt):
-    X_train, X_test, Y_train, Y_test = train_test_split(data, labels, test_size=test_size)
-    chains = [ClassifierChain(LogisticRegression(), order="random", random_state=i) for i in range(chains_amt)]
-    for chain in chains:
-        chain.fit(X_train, Y_train)
-
-    Y_pred_chains = np.array([chain.predict_proba(X_test) for chain in chains])
-    Y_pred_ensemble = Y_pred_chains.mean(axis=0).reshape(1, -1)[0]
-    Y_test_arr = np.array(Y_test).reshape(1, -1)[0]
-
-    ensemble_jaccard_score = jaccard_score(
-        Y_test_arr, Y_pred_ensemble >= PRED_OK
-    )
-
-    ensemble_precision_score = precision_score(
-        Y_test_arr, Y_pred_ensemble >= PRED_OK
-    )
-
-    ensemble_recall_score = recall_score(
-        Y_test_arr, Y_pred_ensemble >= PRED_OK
-    )
-
-    ensemble_accuracy_score = accuracy_score(
-        Y_test_arr, Y_pred_ensemble >= PRED_OK
-    )
-
-    return {
-        "model": chains,
-        "precision": ensemble_precision_score,
-        "recall": ensemble_recall_score,
-        "accuracy": ensemble_accuracy_score,
-        "jaccard": ensemble_jaccard_score
-    }
-    
-\end{lstlisting}
-    
-\begin{lstlisting}[caption={Применение моделей}]
-def to_tags_list(labels):
-    tags = []
-    i = 0
-    for key in KEYS:
-        if labels[0][i]:
-            tags.append(key)
-        i += 1
-    return tags
-\end{lstlisting}
-    
-\begin{lstlisting}[caption={Применение моделей}]
-def predict_tags(text, model):
-    if isinstance(model, list):
-        Y_pred_chains = np.array([chain.predict_proba(text) for chain in model])
-        return to_tags_list(Y_pred_chains.mean(axis=0).reshape(1, -1) >= PRED_OK)
-    
-    return to_tags_list(model.predict(text))
-\end{lstlisting}
-
-Помимо описанных выше функций в программе реализовано меню, посредством которого пользователь осуществляет ввод данных, а также управляющий модуль, который на основе введенных данных вызывает соответствующие функции.
-
-\newpage
-
-\section{Исследовательский раздел}
-\subsection{Исследование моделей}
-Так как результатом многозначной классификации является последовательность логических выражений <<истина>> и <<ложь>>, то для оценки ее точности можно использовать те же параметры, основанные на матрице ошибок, что и в классической бинарной классификации.
-
-К этим показателям относятся [17]:
-\begin{itemize}
-    \item[---] точность (precision) --- показывает, сколько объектов, предсказанных положительными, действительно таковыми являются ($TP / (TP + FP)$);
-    \item[---] полнота (recall) --- показывает, сколько объектов, являющихся положительными, были правильно обнаружены моделью ($TP / (TP + FN)$);
-    \item[---] общая точность (accuracy) --- показывает, как часто модель предсказывает любой класс верно (доля правильных ответов, $(TP + TN) / (TP + TN + FN + FP)$);
-    \item[---] f1-мера (F1-score) --- гармоническое среднее точности $p$ и полноты $r$ ($2pr/(p + r)$).
+	\item[---] \textbf{Безопасность  хранения  данных}.  Несанкционированный  доступ к данным клиентам должен быть невозможен.
+	
+	\item[---] \textbf{Транзакционность}.  Должен  соблюдаться  принцип  «ACID» (Atomicity  —  Атомарность,  Consistency  —  Согласованность, Isolation — Изолированность, Durability — Надежность). Атомарность гарантирует, что транзакция не может быть зафиксирована частично.  Согласованность  —  что  успешное  завершение  транзакции оставит  систему  в  согласованном состоянии. Изолированность  —  что  параллельно  выполняемые  транзакции  не  будут влиять друг на друга. Надежность — что успешно завершенная транзакция  будет  зафиксирована,  а  в случае  сбоя, после восстановления системы, результаты транзакции не будут утеряны.
+	
+	\item[---] \textbf{Масштабируемость}.  Выбранная  СУБД  должна  поддерживать репликацию, шардирование.
 \end{itemize}
 
-В данной задаче выходной массив можно назвать разреженным, так как в исходном датасете из 98 тегов одной статье соответствует не более 5 тегов. 
-По этой причине, за счет того что подавляющее число значений в выходном векторе являются значениями <<ложь>>, значение accuracy, вероятнее всего, будет высоким, но при этом недостаточно хорошо отражающим качество модели.
+PostgreSQL [10] --- реляционная система управления базами данных. 
+Она является некоммерческим ПО с открытым исходным кодом. 
+Для работы с этой СУБД существуют библиотеки для таких распространенных языков программирования, как Python, Ruby, Perl, PHP, C, C++, Java, C\#, Go. 
+Она работает под управлением многих операционных систем: Linux, MacOS, Windows, Solaris и др. 
+По сравнению с MySQL система PostgreSQL лучше работает с репликацией, так как в ней существует журнал (средство восстановления системы в случае сбоя) физической модификации страниц. 
+PostgreSQL осуществляет асинхронную репликацию типа «ведущий — ведомый».
 
-На рисунке \ref{accuracy} продемонстрирован график зависимости общей точности классификации от объема обучающей выборки для разных моделей.
-На нем можно видеть, что эта метрика везде приблизительно составляет 98\%.
+Выбор СУБД PostgreSQL для хранения данных разрабатываемой системы обеспечит надежность, безопасность и масштабируемость. \\
 
-Ниже будут рассмотрены другие показатели, которые являются более репрезентативными для данной задачи.
+\subsubsection{Средства разработки Identity Provider}
+Для реализации функций Identity Provider используется Keycloak [11].
+Это открытая платформа для управления идентификацией и доступом, которая позволяет разработчикам и администраторам легко управлять пользователями, ролями и доступом к различным приложениям.
+На Keycloak переложены аутентификация, хранение данных о пользователях и управление сессиями.
+Получение токенов, создание пользователей администратором и выход из учетной записи выполняются сервисом авторизации путем отправки соответствующих HTTP-запросов в Keycloak.
+
+\subsubsection{Средства развертывания приложения}
+Первоначально для развертывания приложения была выбрана платформа VK Cloud [12].
+Это облачная платформа, предоставляемая компанией VK, которая предлагает различные облачные сервисы и решения для разработчиков. 
+Платформа ориентирована на предоставление гибких и масштабируемых инфраструктурных ресурсов, таких как вычислительные мощности, хранилища данных, базы данных, сетевые решения и инструменты для развертывания приложений, в частности, управляемые кластеры Kubernetes.
+Однако на каждого пользователя выделяется квота в 4 машины и 16 ГБ суммарной оперативной памяти.
+На мастер-узел кластера требуется минимум 6 ГБ RAM.
+На рабочих узлах требовалось развернуть 15 подов --- 6 сервисов, 4 базы данных, 3 пода для работы Kafka, клиентская часть приложения и Keycloak.
+Были проверены следующие конфигурации:
+\begin{enumerate}
+	\item 2 рабочих узла с 4 ГБ оперативной памяти в каждом. Конфигурация не подошла, так как на ней можно было развернуть максимум 8 подов, этого не хватает даже, чтобы развернуть только бэкенд (все остальное можно было поднять на свободной машине в контейнере Docker).
+	\item 3 рабочих узла с 2 ГБ оперативной памяти в каждом. Такая конфигурация также не подошла, так как узлы не выдерживали нагрузки и их требовалось постоянно перезагружать.
+	\item Остальные возможные конфигурации выходили за рамки квот.
+\end{enumerate}
+
+Таким образом, пришлось отказаться от разворачивания приложения в облаке и для деплоя был выбран minikube [13], который позволяет развернуть кластер Kubernetes локально.
+
+\subsection{Интерфейс программы}
+На рисунке \ref{fig:interface} приведен пример web-страницы интерфейса разработанного приложения.
+\begin{figure}[h!]
+	\begin{center}
+		{\includegraphics[scale = 0.2]{interface}}
+		\caption{Интерфейс приложения}
+		\label{fig:interface}
+	\end{center}
+\end{figure}
+
+В приложении реализована деградация функциональности.
+Например, в тестовых данных были бронирования, для которых указана несуществующая библиотека. 
+При запросе дополнительной информации о библиотеке в сервисе библиотек срабатывало исключение и возвращалась 500 ошибка.
+При этом страница отобразилась корректно, остались лишь пропуски на месте несуществующей библиотеки, как показано на рисунке \ref{fig:degradation}. 
+
+
+Также была реализована ролевая модель.
+Роль пользователей считывается сервисами из JWT-токена и выполняется проверка соответствия роли пользователя той роли, которой разрешен запрос.
+Например, сервис статистики доступен только администратору.
+Клиент при запросе статистики увидит сообщение, приведенное на рисунке \ref{fig:roles}. 
+
 \newpage
-
 \begin{figure}[h!]
-    \captionsetup{justification=centering}
-    \center{\includegraphics[scale=0.9]{accuracy}}
-    \caption{Значение метрики accuracy для разных моделей}
-    \label{accuracy}
+	\begin{center}
+		{\includegraphics[scale = 0.2]{degradation}}
+		\caption{Деградация функциональности при ошибке в сервисе библиотек}
+		\label{fig:degradation}
+	\end{center}
 \end{figure}
 
-Показатель recall при многозначной классификации подходит в задачах, где очень важно обнаружить все релевантные метки и пропуск любой метки может привести к значительным негативным последствиям.
-В случае определения тегов для текста вполне допустимо пропустить одну или несколько меток, сходных по значению, присвоив только некоторые. 
-
-С другой стороны, показатель precision позволяет понимать, как часто модель ошибается, присваивая теги, которые на самом деле отсутствуют.
-С точки зрения определения тегов этот показатель более информативен, так как важно присваивать метки, соответствующие материалам текста. 
-
-Так как ранее было выяснено, что для цепочки классификаторов требуется строить несколько моделей и усреднять их для получения лучшего качества, сперва необходимо исследовать влияние числа этих моделей на результат с целью подбора оптимального.
-На рисунке \ref{chains} приводится график зависимости точности результатов, предсказанных моделью, от числа цепочек в этой модели.
-\newpage
 \begin{figure}[h!]
-    \captionsetup{justification=centering}
-    \center{\includegraphics[scale=0.7]{chains}}
-    \caption{Зависимость метрики precision от количества классификаторов в цепочке}
-    \label{chains}
+	\begin{center}
+		{\includegraphics[scale = 0.2]{roles}}
+		\caption{Сообщение о недостатке прав для обычного пользователя}
+		\label{fig:roles}
+	\end{center}
 \end{figure}
 
-Из графика следует, что примерно при 5-10 цепочках значение точности выравнивается и дальнейшее увеличение их числа уже не приводит к повышению качества модели.
-Поэтому далее при сравнении моделей будет указываться результат для модели с 10 цепочками.
-
-На рисунке \ref{precision} продемонстрирован график зависимости точности классификации от объема обучающей выборки для разных моделей.
-
-\begin{figure}[h!]
-    \captionsetup{justification=centering}
-    \center{\includegraphics[scale=0.82]{precision}}
-    \caption{Значение метрики precision для разных моделей}
-    \label{precision}
-\end{figure}
-
-На графике можно видеть, что при выборе метода векторизации TF-IDF исследуемая метрика получается примерно на 5 процентных пунктов (или на 7.5\%) выше, чем при векторизации методом Word2Vec, и составляет примерно 70-73\%.
-Также можно отметить, что наивысшая точность получается при небольшой тестовой выборке, примерно 5-10\% от общего объема датасета.
-Далее происходит переобучение и точность снижается.
-В то же время разница между использованием независимых классификаторов и их цепочки несущественна.
-
-Также было вычислено значение метрики, аналогичной recall и обозначающей долю данных тестовой выборки, для которых модель верно предсказала хотя бы один тег.
-Среднее гармоническое этой метрики и precision (аналог f1-меры) приводится на рисунке \ref{f1}.
-При этом сохраняется тенденция метода векторизации TF-IDF к более высоким показателям качества в данной задаче, чем у Word2Vec.
-
-\begin{figure}[h!]
-    \captionsetup{justification=centering}
-    \center{\includegraphics[scale=0.82]{ones}}
-    \caption{Значение аналога метрики f1 для разных моделей}
-    \label{f1}
-\end{figure}
-
-Таким образом, наилучшей из исследованных моделей является модель на основе векторизации TF-IDF, построенная на обучении независимых классификаторов, так как он обеспечивает тот же уровень качества, что и цепочка классификаторов, но работает быстрее за счет возможности параллелизации и отсутствия дополнительных входных параметров.
-
-Объем тренировочной выборки можно варьировать в зависимости от целей: если не так важно определить все теги для текста, но определять их точнее, то объем тренировочной выборки может составлять около 10\% от всего датасета.
-Если же важно получить более широкое множество релевантных тегов, то для повышения значения recall можно увеличить долю тренировочной выборки вплоть до 90\%.
-
-\subsection{Демонстрация работы программы}
-На рисунке \ref{tags} изображен пример вывода программы при вводе текста, взятого не из датасета и не с источника Medium.
-В тексте рассказывается об особенностях экотуризма, его преимуществах и отличиях от массового туризма. 
-Как можно видеть, модель распознала теги <<Окружающая среда>>, <<Изменение климата>> и <<Путешествия>>, что соответствует тематике текста.
-\begin{figure}[h!]
-    \captionsetup{justification=centering}
-    \center{\includegraphics[scale=0.35]{interface}}
-    \caption{Демонстрация работы программы}
-    \label{tags}
-\end{figure}
 
 \newpage
 \titleformat{\section}[block]
@@ -975,36 +1007,30 @@ def predict_tags(text, model):
 \addcontentsline{toc}{section}{ЗАКЛЮЧЕНИЕ}
 В результате выполнения курсовой работы: 
 \begin{itemize}
-    \item[---] проанализированы и выбраны методы векторизации и многозначной классификации, необходимые для решения поставленной задачи;
-    \item[---] описан набор данных, на которых проводилось обучение модели;
-    \item[---] разработано программное обеспечение, реализующее обучение модели, а также определение тегов к произвольному тексту на основе предобученной модели;
-    \item[---] выбраны метрики качества и сравнены различные реализации модели по этим метрикам.
+    \item[---] сформулированы основные требования к системе и ее подсистемам;
+    \item[---] описана архитектура системы в виде диаграмм в нотациях UML и IDEF0, а также указаны некоторые сценарии её функционирования;
+    \item[---] разработано, развернуто и протестировано программное обеспечение, выполняющее основные заявленные требования и функциональность.
 \end{itemize}
 
-В результате сравнения был выбран метод векторизации TF-IDF в сочетании с обучением независимых бинарных классификаторов.
+Таким образом, была разработана распределенная система для бронирования книг в библиотеках.
 
-Таким образом, была разработана и протестирована модель для подбора тегов к англоязычным текстам.
 \newpage
 \section*{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}
 \addcontentsline{toc}{section}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}
 \begin{enumerate}
-    \item Абрамов, Е. Г. Подбор ключевых слов для научной статьи / Е. Г. Абрамов // Научная периодика: проблемы и решения. --- 2011. --- № 2(2). --- С. 35-40.
-    \item Кравченко, Ю. А. Векторизация текста с использованием методов интеллектуального анализа данных / Ю. А. Кравченко, А. М. Мансур, Ж. Х. Мохаммад // Известия ЮФУ. Технические науки. --- 2021. --- № 2(219). --- С. 154-167.
-    \item Le Q., Mikolov T. Distributed Representations of Sentences and Documents // Proceedings of the 31st International Conference on Machine Learning. Т. 32 / под ред. E. P. Xing, T. Jebara. --- Beijing, China : PMLR, 22–24 Jun.2014. --- С. 1188—1196.
-    \item Mikolov T. Efficient Estimation of Word Representations in Vector Space / T. Mikolov [и др.]. --- 2013.
-    \item Jesse Read, Bernhard Pfahringer, Geoff Holmes. Classifier Chains for Multi-label Classification. --- 2009.
-    \item Multiclass and multioutput algorithms --- scikit-learn 1.5.0 documentation [Электронный ресурс]. Режим доступа: \url{https://scikit-learn.org/stable/modules/multiclass.html} (дата обращения: 26.05.2024).
-    \item 190k+ Medium Articles | Kaggle [Электронный ресурс]. Режим доступа: \url{https://www.kaggle.com/datasets/fabiochiusano/medium-articles} (дата обращения: 26.05.2024).
-    \item РД IDEF0-2000. Методология функционального моделирования IDEF0: руководящий документ. // М.: Госстандарт России. --- 2000. --- 75 с.
-    \item Our Documentation | Python.org [Электронный ресурс]. Режим доступа: \url{https://www.python.org/doc/} (дата обращения: 06.06.2024).
-    \item Visual Studio Code --- Code Editing. Redefined [Электронный ресурс]. Режим доступа: \url{https://code.visualstudio.com/} (дата обращения: 06.06.2024).
-    \item scikit-learn: machine learning in Python --- scikit-learn 1.5.0 documentation [Электронный ресурс]. Режим доступа: \url{https://scikit-learn.org/stable/index.html} (дата обращения: 08.06.2024).
-    \item Gensim: Topic modelling for humans [Электронный ресурс]. Режим доступа: \url{https://radimrehurek.com/gensim/} (дата обращения: 08.06.2024).
-    \item pandas --- Python Data Analysis Library [Электронный ресурс]. Режим доступа: \url{https://pandas.pydata.org/} (дата обращения: 08.06.2024).
-    \item Matplotlib --- Visualization with Python [Электронный ресурс]. Режим доступа: \url{https://matplotlib.org/} (дата обращения: 08.06.2024).
-    \item Welcome to skops's documentation! --- skops 0.9 documentation [Электронный ресурс]. Режим доступа: \url{https://skops.readthedocs.io/en/stable/} (дата обращения: 08.06.2024).
-    \item NumPy [Электронный ресурс]. Режим доступа: \url{https://numpy.org/}(дата обращения --- 08.06.2024).
-    \item Metrics for Multilabel Classification | Mustafa Murat ARAT [Электронный ресурс]. Режим доступа: \url{https://mmuratarat.github.io/2020-01-25/multilabel_classification_metrics} (дата обращения: 06.06.2024).
+    \item Что такое REST API [Электронный ресурс]. Режим доступа: \url{https://ru.hexlet.io/blog/posts/chto-takoe-rest-api} (дата обращения: 27.04.2024).
+    \item Circuit Breaker pattern --- Azure Architecture Center | Microsoft Learn [Электронный ресурс]. Режим доступа: \url{https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker} (дата обращения: 17.08.2024).
+    \item JSON Web Token Introduction --- jwt.io [Электронный ресурс]. Режим доступа: \url{https://jwt.io/introduction} (дата обращения: 17.08.2024).
+    \item Kubernetes Documentation | Kubernetes [Электронный ресурс]. Режим доступа: \url{https://kubernetes.io/docs/home/} (дата обращения: 17.08.2024).
+    \item Ingress Controllers | Kubernetes [Электронный ресурс]. Режим доступа: \url{https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/} (дата обращения: 17.08.2024).
+    \item Helm | Docs [Электронный ресурс]. Режим доступа: \url{https://helm.sh/docs/} (дата обращения: 17.08.2024).
+    \item Final: OpenID Connect Core 1.0 incorporating errata set 2 [Электронный ресурс]. Режим доступа: \url{https://openid.net/specs/openid-connect-core-1_0.html} (дата обращения: 21.08.2024).
+    \item RFC 6749 --- The OAuth 2.0 Authorization Framework [Электронный ресурс]. Режим доступа: \url{https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.1} (дата обращения: 21.08.2024).
+    \item Apache Kafka [Электронный ресурс]. Режим доступа: \url{https://kafka.apache.org/documentation/} (дата обращения: 17.08.2024).
+    \item PostgreSQL: Documentation [Электронный ресурс]. Режим доступа: \url{https://www.postgresql.org/docs/} (дата обращения: 20.06.2024).
+    \item Documentation --- Keycloak [Электронный ресурс]. Режим доступа: \url{https://www.keycloak.org/documentation} (дата обращения: 20.08.2024).
+    \item VK Cloud | Облачная ИТ-платформа бизнес-класса от VK [Электронный ресурс]. Режим доступа: \url{https://cloud.vk.com/} (дата обращения: 26.08.2024).
+    \item Welcome! | minikube [Электронный ресурс]. Режим доступа: \url{https://minikube.sigs.k8s.io/docs/} (дата обращения: 26.08.2024).
 \end{enumerate}
 
 \end{large}

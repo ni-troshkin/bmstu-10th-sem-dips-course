@@ -1,0 +1,165 @@
+name: GitHub Classroom Workflow
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      
+env:
+  APP_VERSION: 1 
+  #${{ github.run_number }}
+  
+  RATING_IMAGE_NAME: nitroshkin/service-rating
+  RATING_DB_IMAGE_NAME: nitroshkin/db-rating
+  RATING_DB_PROPERTIES_PATH: ./app/server/services/rating/RatingService/src/main/resources/database.properties
+  RATING_PG_USER: dev
+  RATING_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  
+  LIBRARY_IMAGE_NAME: nitroshkin/service-library
+  LIBRARY_DB_IMAGE_NAME: nitroshkin/db-library
+  LIBRARY_DB_PROPERTIES_PATH: ./app/server/services/library/LibraryService/src/main/resources/database.properties
+  LIBRARY_PG_USER: dev
+  LIBRARY_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  
+  RESERVATIONS_IMAGE_NAME: nitroshkin/service-reservations
+  RESERVATIONS_DB_IMAGE_NAME: nitroshkin/db-reservations
+  RESERVATIONS_DB_PROPERTIES_PATH: ./app/server/services/reservations/ReservationService/src/main/resources/database.properties
+  RESERVATIONS_PG_USER: dev
+  RESERVATIONS_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  
+  STATS_IMAGE_NAME: nitroshkin/service-stats
+  STATS_DB_IMAGE_NAME: nitroshkin/db-stats
+  STATS_DB_PROPERTIES_PATH: ./app/server/services/stats/StatsService/src/main/resources/database.properties
+  STATS_PG_USER: dev
+  STATS_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  
+  AUTH_IMAGE_NAME: nitroshkin/service-auth
+  AUTH_PROPERTIES_PATH: ./app/server/services/auth/IdentityProvider/src/main/resources/application.properties
+  AUTH_KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
+  
+  DB_HELM_VALUES_PATH: ./.kube/db_helm/values.yaml
+  SERVICE_HELM_VALUES_PATH: ./.kube/service_helm/values.yaml
+  
+  GATEWAY_IMAGE_NAME: nitroshkin/service-gateway
+  
+  CLIENT_IMAGE_NAME: nitroshkin/client-library
+
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKER_USERNAME: nitroshkin
+#  EXTERNAL_IP: 212.233.99.200.nip.io
+  
+jobs:
+  build:
+    name: Autograding
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v2
+      - name: Build and Publish Server
+        run: |
+          echo "APP_VERSION=$APP_VERSION" >> .env
+          echo "RATING_PG_USER=$RATING_PG_USER" >> .env
+          echo "RATING_PG_PASSWORD=$RATING_PG_PASSWORD" >> .env
+          rm -rf $RATING_DB_PROPERTIES_PATH
+          echo "db.url=jdbc:postgresql://rating-db:5432/ratingservice" >> $RATING_DB_PROPERTIES_PATH
+          echo "db.username=$RATING_PG_USER" >> $RATING_DB_PROPERTIES_PATH
+          echo "db.password=$RATING_PG_PASSWORD" >> $RATING_DB_PROPERTIES_PATH
+          echo "LIBRARY_PG_USER=$LIBRARY_PG_USER" >> .env
+          echo "LIBRARY_PG_PASSWORD=$LIBRARY_PG_PASSWORD" >> .env
+          rm -rf $LIBRARY_DB_PROPERTIES_PATH
+          echo "db.url=jdbc:postgresql://library-db:5432/libraryservice" >> $LIBRARY_DB_PROPERTIES_PATH
+          echo "db.username=$LIBRARY_PG_USER" >> $LIBRARY_DB_PROPERTIES_PATH
+          echo "db.password=$LIBRARY_PG_PASSWORD" >> $LIBRARY_DB_PROPERTIES_PATH
+          echo "RESERVATIONS_PG_USER=$RESERVATIONS_PG_USER" >> .env
+          echo "RESERVATIONS_PG_PASSWORD=$RESERVATIONS_PG_PASSWORD" >> .env
+          rm -rf $RESERVATIONS_DB_PROPERTIES_PATH
+          echo "db.url=jdbc:postgresql://reservation-db:5432/reservationsservice" >> $RESERVATIONS_DB_PROPERTIES_PATH
+          echo "db.username=$RESERVATIONS_PG_USER" >> $RESERVATIONS_DB_PROPERTIES_PATH
+          echo "db.password=$RESERVATIONS_PG_PASSWORD" >> $RESERVATIONS_DB_PROPERTIES_PATH
+          echo "STATS_PG_USER=$STATS_PG_USER" >> .env
+          echo "STATS_PG_PASSWORD=$STATS_PG_PASSWORD" >> .env
+          rm -rf $STATS_DB_PROPERTIES_PATH
+          echo "db.url=jdbc:postgresql://stats-db:5432/statsservice" >> $STATS_DB_PROPERTIES_PATH
+          echo "db.username=$STATS_PG_USER" >> $STATS_DB_PROPERTIES_PATH
+          echo "db.password=$STATS_PG_PASSWORD" >> $STATS_DB_PROPERTIES_PATH
+          echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+          docker build --quiet -t $RATING_IMAGE_NAME:$APP_VERSION ./app/server/services/rating/RatingService
+          docker build --quiet -t $LIBRARY_IMAGE_NAME:$APP_VERSION ./app/server/services/library/LibraryService
+          docker build --quiet -t $RESERVATIONS_IMAGE_NAME:$APP_VERSION ./app/server/services/reservations/ReservationService
+          docker build --quiet -t $GATEWAY_IMAGE_NAME:$APP_VERSION ./app/server/services/gateway/GatewayService
+          docker build --quiet -t $AUTH_IMAGE_NAME:$APP_VERSION ./app/server/services/auth/IdentityProvider
+          docker build --quiet -t $STATS_IMAGE_NAME:$APP_VERSION ./app/server/services/stats/StatsService
+          docker push $RATING_IMAGE_NAME:$APP_VERSION
+          docker push $LIBRARY_IMAGE_NAME:$APP_VERSION
+          docker push $RESERVATIONS_IMAGE_NAME:$APP_VERSION
+          docker push $GATEWAY_IMAGE_NAME:$APP_VERSION
+          docker push $AUTH_IMAGE_NAME:$APP_VERSION
+          docker push $STATS_IMAGE_NAME:$APP_VERSION
+          docker build --quiet -t $RATING_DB_IMAGE_NAME:$APP_VERSION ./app/server/services/rating/sql
+          docker build --quiet -t $LIBRARY_DB_IMAGE_NAME:$APP_VERSION ./app/server/services/library/sql
+          docker build --quiet -t $RESERVATIONS_DB_IMAGE_NAME:$APP_VERSION ./app/server/services/reservations/sql
+          docker build --quiet -t $STATS_DB_IMAGE_NAME:$APP_VERSION ./app/server/services/stats/sql
+          docker push $RATING_DB_IMAGE_NAME:$APP_VERSION
+          docker push $LIBRARY_DB_IMAGE_NAME:$APP_VERSION
+          docker push $RESERVATIONS_DB_IMAGE_NAME:$APP_VERSION
+          docker push $STATS_DB_IMAGE_NAME:$APP_VERSION
+          docker build --no-cache --quiet -t $CLIENT_IMAGE_NAME:$APP_VERSION ./app/client
+          docker push $CLIENT_IMAGE_NAME:$APP_VERSION
+
+      - name: Deploy to k8s
+        run: |
+          pwd
+          curl -sSL https://hub.mcs.mail.ru/repository/client-keystone-auth/latest/linux/client-install.sh | bash
+          exec -l $SHELL
+          sed -e 's/!PASSWORD!/$RATING_PG_PASSWORD/' ./.kube/kubernetes-cluster-8583_kubeconfig.yaml > ./.kube/tmp.yaml
+          rm -rf ./.kube/kubernetes-cluster-8583_kubeconfig.yaml
+          mv ./.kube/tmp.yaml ./.kube/kubernetes-cluster-8583_kubeconfig.yaml
+          export KUBECONFIG=./.kube/kubernetes-cluster-8583_kubeconfig.yaml
+          echo "dbPort=5432" > $DB_HELM_VALUES_PATH
+          echo "version=$APP_VERSION" >> $DB_HELM_VALUES_PATH
+          echo "password=$RATING_PG_PASSWORD" >> $DB_HELM_VALUES_PATH
+          echo "port=8080" > $SERVICE_HELM_VALUES_PATH
+          echo "version=$APP_VERSION" >> $SERVICE_HELM_VALUES_PATH
+          kubectl apply -f ./.kube/db-data/ --validate=false
+          kubectl apply -f ./.kube/kafka/ --validate=false
+          kubectl apply -f ./.kube/ingress.yaml --validate=false
+          kubectl apply -f ./.kube/keycloak.yaml --validate=false
+          helm install rating .kube/db_helm
+          helm install library .kube/db_helm
+          helm install reservations .kube/db_helm
+          helm install stats .kube/db_helm
+          helm install service-rating .kube/service_helm --set port=8050
+          helm install service-library .kube/service_helm --set port=8060
+          helm install service-reservations .kube/service_helm --set port=8070
+          helm install service-stats .kube/service_helm --set port=8040
+          helm install service-auth .kube/service_helm --set port=8090
+          helm install service-gateway .kube/service_helm
+          helm install client-library .kube/service_helm --set port=3000
+
+      #- name: Run API Tests
+      #  uses: matt-ball/newman-action@master
+      #  with:
+      #    collection: v4/postman/collection.json
+      #    environment: v4/postman/environment.json
+      #    delayRequest: 100
+      #    reporters: '[ "cli" ]'
+
+      #- uses: education/autograding@v1
+      #  id: autograder
+      #  continue-on-error: true
+
+      #- name: Github auto grader mark
+      #  uses: Romanow/google-sheet-autograder-marker@v1.0
+      #  with:
+      #    google_token: ${{secrets.GOOGLE_API_KEY}}
+      #    sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
+      #    homework_number: 4
+      #    user_column: 'D'
+      #    column_offset: 'F'
+      #    mark: "'+"
