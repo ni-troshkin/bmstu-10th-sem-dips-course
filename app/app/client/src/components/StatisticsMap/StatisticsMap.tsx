@@ -39,6 +39,7 @@ class StatisticsMap extends React.Component<StatisticsBoxProps, State> {
 
     async getAllAvgRequestTime() {
         var data = await this.props.getCallRequest();
+        console.log(data.status);
         if (data.status === 200)
             this.setState({avgRequestTime: data.content, isAdmin: true})
     }

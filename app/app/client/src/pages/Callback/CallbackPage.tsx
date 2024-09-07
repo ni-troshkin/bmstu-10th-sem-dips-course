@@ -21,7 +21,7 @@ const CallbackPage: React.FC<AllLibraries> = (props) => {
       let req: TokenRequest = {
         authentication_code: code,
         client_id: "library-client",
-        client_secret: "HAE3HSXK21FaJu6ssMTddAcA1aUFLILU",
+        client_secret: "IsfGi68JK0qYEvJYrsdLYaZJQYj27rh3",
         redirect_uri: "http%3A%2F%2Flocalhost%3A3000%2Ftoken"
       }
       let resp: TokenResponseResp = await Token(req);
